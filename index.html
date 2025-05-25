@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Foco nos Treinos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #000000;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 1rem;
+    }
+    h1 {
+      margin-bottom: 1rem;
+      user-select: none;
+    }
+    .counter {
+      font-size: 1.5rem;
+      margin: 1rem 0;
+      user-select: none;
+    }
+    .form {
+      margin: 1rem 0;
+      user-select: none;
+    }
+    select, input[type="text"] {
+      padding: 0.5rem;
+      margin-right: 0.5rem;
+      border-radius: 4px;
+      border: none;
+      font-size: 1rem;
+      outline: none;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      background: #2ecc71;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+      font-size: 1rem;
+    }
+    button:hover {
+      background: #27ae60;
+      transform: scale(1.05);
+    }
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.5rem;
+      max-width: 500px;
+      margin: 0 auto;
+      user-select: none;
+    }
+    .day {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      transition: background 0.3s, transform 0.3s;
+      color: #fff;
+      user-select: none;
+    }
+    .day:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+    .day.trained {
+      background: #a0e3a0;
+      color: #1a370a;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>Foco nos Treinos 💪</h1>
+    <div class="counter">Dias seguidos: <span id="streak">0</span></div>
+
+    <div class="form">
+      <select id="treino-select"></select>
+      <input type="text" id="novo-treino" placeholder="Novo treino" />
+      <button onclick="adicionarTreino()">Adicionar treino</button>
+    </div>
+
+    <div class="calendar" id="calendar"></div>
+  </div>
+
+  <script>
+    const treinoSelect = document.getElementById("treino-select");
+    const calendar = document.getElementById("calendar");
+    const streakEl = document.getElementById("streak");
+
+    let treinos = JSON.parse(localStorage.getItem("treinos")) || ["Peito", "Pernas", "Cardio"];
+    let diasTreinados = JSON.parse(localStorage.getItem("diasTreinados")) || {};
+
+    function salvar() {
+      localStorage.setItem("treinos", JSON.stringify(treinos));
+      localStorage.setItem("diasTreinados", JSON.stringify(diasTreinados));
+    }
+
+    function atualizarTreinos() {
+      treinoSelect.innerHTML = "";
+      treinos.forEach(t => {
+        const opt = document.createElement("option");
+        opt.value = t;
+        opt.textContent = t;
+        treinoSelect.appendChild(opt);
+      });
+    }
+
+    function adicionarTreino() {
+      const novo = document.getElementById("novo-treino").value.trim();
+      if (novo && !treinos.includes(novo)) {
+        treinos.push(novo);
+        document.getElementById("novo-treino").value = "";
+        atualizarTreinos();
+        salvar();
+      }
+    }
+
+    function montarCalendario() {
+      calendar.innerHTML = "";
+      const hoje = new Date();
+      const ano = hoje.getFullYear();
+      const mes = hoje.getMonth();
+      const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+      for (let i = 1; i <= diasNoMes; i++) {
+        const data = `${ano}-${mes + 1}-${i}`;
+        const dia = document.createElement("div");
+        dia.className = "day";
+        if (diasTreinados[data]) dia.classList.add("trained");
+        dia.textContent = i;
+        dia.title = diasTreinados[data] || "Clique para marcar";
+        dia.onclick = () => {
+          if (diasTreinados[data]) {
+            delete diasTreinados[data];
+          } else {
+            diasTreinados[data] = treinoSelect.value;
+          }
+          salvar();
+          montarCalendario();
+          calcularStreak();
+        };
+        calendar.appendChild(dia);
+      }
+    }
+
+    function calcularStreak() {
+      const hoje = new Date();
+      let streak = 0;
+      for (let i = 0; i < 365; i++) {
+        const data = new Date();
+        data.setDate(hoje.getDate() - i);
+        const key = `${data.getFullYear()}-${data.getMonth() + 1}-${data.getDate()}`;
+        if (diasTreinados[key]) {
+          streak++;
+        } else {
+          break;
+        }
+      }
+      streakEl.textContent = streak;
+    }
+
+    atualizarTreinos();
+    montarCalendario();
+    calcularStreak();
+  </script>
+</body>
+</html>
+
+
