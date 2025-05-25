@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Controle de Água</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #f0f8ff;
+      --text-color: #111;
+      --primary: #2196f3;
+      --card-bg: #fff;
+    }
+
+    body.dark-mode {
+      --bg-color: #121212;
+      --text-color: #eee;
+      --primary: #64b5f6;
+      --card-bg: #1e1e1e;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .topbar {
+      width: 100%;
+      text-align: right;
+      padding: 1rem;
+    }
+
+    .container {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 1rem;
+    }
+
+    .progress {
+      background: #ddd;
+      border-radius: 1rem;
+      overflow: hidden;
+      height: 20px;
+      margin: 1rem 0;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.7rem 1.2rem;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      margin: 0.3rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .status, .historico {
+      margin-top: 1rem;
+      font-size: 0.95rem;
+    }
+
+    .historico ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .historico li {
+      margin: 0.2rem 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <button onclick="alternarModo()">🌓 Modo</button>
+  </div>
+  <div class="container">
+    <h1>💧 Controle de Água</h1>
+    <div class="status">
+      Meta: <span id="meta">2000</span>ml<br />
+      Consumido hoje: <span id="consumido">0</span>ml
+    </div>
+    <div class="progress">
+      <div class="progress-bar" id="barraProgresso"></div>
+    </div>
+    <div>
+      <button onclick="adicionarAgua(200)">+ 200ml (Copo)</button>
+      <button onclick="adicionarAgua(500)">+ 500ml (Garrafa)</button>
+      <button onclick="adicionarAgua(300)">+ 300ml (Caneca)</button>
+    </div>
+    <div class="status" id="mensagem"></div>
+    <div class="historico">
+      <h3>Histórico</h3>
+      <ul id="historicoLista"></ul>
+    </div>
+  </div>
+
+  <script>
+    const meta = 2000;
+    const consumidoSpan = document.getElementById('consumido');
+    const barra = document.getElementById('barraProgresso');
+    const mensagem = document.getElementById('mensagem');
+    const historicoLista = document.getElementById('historicoLista');
+
+    let dados = JSON.parse(localStorage.getItem('agua')) || {};
+    const hoje = new Date().toISOString().split('T')[0];
+
+    if (!dados[hoje]) dados[hoje] = 0;
+    atualizarTela();
+
+    function adicionarAgua(ml) {
+      dados[hoje] += ml;
+      localStorage.setItem('agua', JSON.stringify(dados));
+      atualizarTela();
+    }
+
+    function atualizarTela() {
+      const totalHoje = dados[hoje];
+      consumidoSpan.textContent = totalHoje;
+      const porcentagem = Math.min((totalHoje / meta) * 100, 100);
+      barra.style.width = porcentagem + '%';
+
+      if (totalHoje >= meta) {
+        mensagem.textContent = '✅ Meta atingida!';
+      } else {
+        mensagem.textContent = `Faltam ${meta - totalHoje}ml para atingir a meta.`;
+      }
+
+      atualizarHistorico();
+    }
+
+    function atualizarHistorico() {
+      historicoLista.innerHTML = '';
+      const dias = Object.keys(dados).slice(-7).reverse();
+      dias.forEach(dia => {
+        const item = document.createElement('li');
+        item.textContent = `${dia}: ${dados[dia]}ml`;
+        historicoLista.appendChild(item);
+      });
+    }
+
+    function alternarModo() {
+      document.body.classList.toggle('dark-mode');
+    }
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Controle de Água</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #f0f8ff;
+      --text-color: #111;
+      --primary: #2196f3;
+      --card-bg: #fff;
+    }
+
+    body.dark-mode {
+      --bg-color: #121212;
+      --text-color: #eee;
+      --primary: #64b5f6;
+      --card-bg: #1e1e1e;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .topbar {
+      width: 100%;
+      text-align: right;
+      padding: 1rem;
+    }
+
+    .container {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 1rem;
+    }
+
+    .progress {
+      background: #ddd;
+      border-radius: 1rem;
+      overflow: hidden;
+      height: 20px;
+      margin: 1rem 0;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.7rem 1.2rem;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      margin: 0.3rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .status, .historico {
+      margin-top: 1rem;
+      font-size: 0.95rem;
+    }
+
+    .historico ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .historico li {
+      margin: 0.2rem 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <button onclick="alternarModo()">🌓 Modo</button>
+  </div>
+  <div class="container">
+    <h1>💧 Controle de Água</h1>
+    <div class="status">
+      Meta: <span id="meta">2000</span>ml<br />
+      Consumido hoje: <span id="consumido">0</span>ml
+    </div>
+    <div class="progress">
+      <div class="progress-bar" id="barraProgresso"></div>
+    </div>
+    <div>
+      <button onclick="adicionarAgua(200)">+ 200ml (Copo)</button>
+      <button onclick="adicionarAgua(500)">+ 500ml (Garrafa)</button>
+      <button onclick="adicionarAgua(300)">+ 300ml (Caneca)</button>
+    </div>
+    <div class="status" id="mensagem"></div>
+    <div class="historico">
+      <h3>Histórico</h3>
+      <ul id="historicoLista"></ul>
+    </div>
+  </div>
+
+  <script>
+    const meta = 2000;
+    const consumidoSpan = document.getElementById('consumido');
+    const barra = document.getElementById('barraProgresso');
+    const mensagem = document.getElementById('mensagem');
+    const historicoLista = document.getElementById('historicoLista');
+
+    let dados = JSON.parse(localStorage.getItem('agua')) || {};
+    const hoje = new Date().toISOString().split('T')[0];
+
+    if (!dados[hoje]) dados[hoje] = 0;
+    atualizarTela();
+
+    function adicionarAgua(ml) {
+      dados[hoje] += ml;
+      localStorage.setItem('agua', JSON.stringify(dados));
+      atualizarTela();
+    }
+
+    function atualizarTela() {
+      const totalHoje = dados[hoje];
+      consumidoSpan.textContent = totalHoje;
+      const porcentagem = Math.min((totalHoje / meta) * 100, 100);
+      barra.style.width = porcentagem + '%';
+
+      if (totalHoje >= meta) {
+        mensagem.textContent = '✅ Meta atingida!';
+      } else {
+        mensagem.textContent = `Faltam ${meta - totalHoje}ml para atingir a meta.`;
+      }
+
+      atualizarHistorico();
+    }
+
+    function atualizarHistorico() {
+      historicoLista.innerHTML = '';
+      const dias = Object.keys(dados).slice(-7).reverse();
+      dias.forEach(dia => {
+        const item = document.createElement('li');
+        item.textContent = `${dia}: ${dados[dia]}ml`;
+        historicoLista.appendChild(item);
+      });
+    }
+
+    function alternarModo() {
+      document.body.classList.toggle('dark-mode');
+    }
+  </script>
+</body>
+</html>
+
