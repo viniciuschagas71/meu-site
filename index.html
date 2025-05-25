@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Plataforma de Estudos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f3f3f3;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .card {
+      background: white;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    input, button, select {
+      padding: 10px;
+      margin: 5px 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .materia {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .tempo {
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>📚 Plataforma de Estudos</h1>
+
+  <div class="card">
+    <h2>Adicionar Matéria</h2>
+    <input type="text" id="novaMateria" placeholder="Nome da matéria">
+    <button onclick="adicionarMateria()">Adicionar</button>
+  </div>
+
+  <div class="card">
+    <h2>Adicionar Tempo de Estudo</h2>
+    <select id="selectMateria"></select>
+    <input type="number" id="tempoEstudo" placeholder="Tempo em minutos">
+    <button onclick="adicionarTempo()">Registrar Estudo</button>
+  </div>
+
+  <div class="card">
+    <h2>Resumo de Estudos</h2>
+    <div id="resumo"></div>
+  </div>
+
+  <script>
+    let estudos = JSON.parse(localStorage.getItem("estudos")) || {};
+
+    function salvar() {
+      localStorage.setItem("estudos", JSON.stringify(estudos));
+    }
+
+    function atualizarResumo() {
+      const resumo = document.getElementById("resumo");
+      resumo.innerHTML = "";
+      for (let materia in estudos) {
+        resumo.innerHTML += `
+          <div class="materia">${materia}</div>
+          <div class="tempo">Tempo total: ${estudos[materia]} minutos</div><hr>
+        `;
+      }
+    }
+
+    function atualizarSelect() {
+      const select = document.getElementById("selectMateria");
+      select.innerHTML = "";
+      for (let materia in estudos) {
+        select.innerHTML += `<option value="${materia}">${materia}</option>`;
+      }
+    }
+
+    function adicionarMateria() {
+      const nome = document.getElementById("novaMateria").value.trim();
+      if (nome && !estudos[nome]) {
+        estudos[nome] = 0;
+        salvar();
+        atualizarSel
+
